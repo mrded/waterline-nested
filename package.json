@@ -1,0 +1,28 @@
+{
+  "name": "waterline-nested",
+  "version": "0.0.1",
+  "description": "A simple helper, allows you to do nested creates and updates with Waterline 0.13 (Sails v1.0).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrded/waterline-nested.git"
+  },
+  "keywords": [
+    "waterline",
+    "sails",
+    "orm",
+    "nested",
+    "create",
+    "update"
+  ],
+  "author": "Dmitry Demenchuk @mrded (dmitry@demenchuk.me)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrded/waterline-nested/issues"
+  },
+  "homepage": "https://github.com/mrded/waterline-nested#readme",
+  "dependencies": {
+    "waterline": "~0.13",
+    "lodash": "~3"
+  }
+}
