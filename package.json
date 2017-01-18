@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/mrded/waterline-nested#readme",
   "dependencies": {
-    "waterline": "~0.13",
+    "waterline": "^0.13.0-3",
     "lodash": "~3"
   }
 }
