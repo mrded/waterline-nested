@@ -2,21 +2,65 @@
 
 var _ = require('lodash');
 
-module.exports.create = function(model, values) {
+var createNested = function(model, values) {
   var mainModel = sails.models[model];
-  var stack = [];
 
+  var associations = {
+    one: {},
+    many: {}
+  };
+
+  // Go through all fields, and try to find included objects.
   _.each(mainModel.attributes, function(value, key) {
+    
+    // One Way associations.
     if (value.model && typeof values[key] === 'object') {
-      var childModel = sails.models[value.model];
-
-      stack.push(childModel.create(values[key]).meta({fetch: true}).then(function(object) {
+      associations.one[key] = createNested(value.model, values[key]).then(function(object) {
         values[key] = object.id;
+      });
+    }
+
+    // Many-to-Many associations.
+    if (value.collection && value.dominant && value.through && typeof values[key] === 'object') {
+      associations.many[key] = Promise.all(values[key].map(function(object) {
+        return createNested(value.collection, object).then(function(object) {
+          return object.id;
+        });
       }));
+
+      delete values[key];
     }
   });
 
-  return Promise.all(stack).then(function() {
-    mainModel.create(values);
+  var oneWayAssociations = _.values(associations.one);
+
+  return Promise.all(oneWayAssociations).then(function() {
+    var output = mainModel.create(values).meta({fetch: true});
+
+    return output.then(function(object) {
+      
+      // Wait associations.many callbacks and create relations via 'through' model.
+      var queries = _.map(associations.many, function(value, key) {
+        var attribute = mainModel.attributes[key];
+        var refModel = sails.models[attribute.through];
+
+        return value.then(function(ids) {
+          return Promise.all(ids.map(function(id) {
+            var data = {};
+
+            data[attribute.collection] = id;
+            data[attribute.via] = object.id;
+
+            return refModel.create(data);
+          }));
+        });
+      });
+
+      return Promise.all(queries).then(function() {
+        return object;
+      });
+    });
   });
 };
+
+module.exports.create = createNested;
