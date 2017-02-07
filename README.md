@@ -7,6 +7,11 @@ A simple helper, allows you to do nested creates and updates with Waterline 0.13
 - [Latest release](https://github.com/mrded/waterline-nested/releases)
 - `npm install waterline-nested`
 
+## Avaliable methods
+
+- `Nested.create()`
+- `Nested.createEach()`
+
 ## Usage
 
 ```javascript

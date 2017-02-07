@@ -1,6 +1,6 @@
 {
   "name": "waterline-nested",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple helper, allows you to do nested creates and updates with Waterline 0.13 (Sails v1.0).",
   "main": "index.js",
   "repository": {

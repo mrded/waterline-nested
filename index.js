@@ -2,6 +2,14 @@
 
 var _ = require('lodash');
 
+var createEachNested = function(model, records) {
+  if (records && records.length > 0) {
+    return createNested(model, records.pop()).then(function() {
+      return createEachNested(records);
+    });
+  }
+};
+
 var createNested = function(model, values) {
   var mainModel = sails.models[model];
 
@@ -67,3 +75,4 @@ var createNested = function(model, values) {
 };
 
 module.exports.create = createNested;
+module.exports.createEach = createEachNested;
