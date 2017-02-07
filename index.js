@@ -4,8 +4,8 @@ var _ = require('lodash');
 
 var createEachNested = function(model, records) {
   if (records && records.length > 0) {
-    return createNested(model, records.pop()).then(function() {
-      return createEachNested(records);
+    return createNested(model, records.shift()).then(function() {
+      return createEachNested(model, records);
     });
   }
 };
