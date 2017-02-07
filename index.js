@@ -35,10 +35,13 @@ var createNested = function(model, values) {
   var oneWayAssociations = _.values(associations.one);
 
   return Promise.all(oneWayAssociations).then(function() {
-    var output = mainModel.create(values).meta({fetch: true});
+    //@TODO: Remove .meta({fetch: true}) once this issue is solved:
+    // - https://github.com/balderdashy/waterline/issues/1444
+    // - https://github.com/balderdashy/waterline/pull/1445
+    var output = mainModel.findOrCreate(_.clone(values), _.clone(values)).meta({fetch: true});
 
     return output.then(function(object) {
-      
+
       // Wait associations.many callbacks and create relations via 'through' model.
       var queries = _.map(associations.many, function(value, key) {
         var attribute = mainModel.attributes[key];
