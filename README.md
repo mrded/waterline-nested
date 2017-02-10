@@ -9,8 +9,17 @@ A simple helper, allows you to do nested creates and updates with Waterline 0.13
 
 ## Avaliable methods
 
-- `Nested.create()`
-- `Nested.createEach()`
+- `Nested.create(model, record)`
+- `Nested.createEach(model, records)`
+
+|   | Argument | Type         | Details                                                                      |
+|---|----------|--------------|----------------------------------|
+| 1 | model    | `String`     | A model name.                    |
+| 2 | record   | `Object`     | An Object that is to be created. |
+| 2 | records  | `Array`      | A list of Objects to be created. |
+
+### Returns
+**Type:** `Promise`
 
 ## Usage
 
@@ -79,3 +88,7 @@ Nested.create('pet', {
 ```
 
 It will automativaly create new user and create a pet associated with that user.
+
+## TODOs
+- [ ] Add tests.
+- [ ] Find a better way to integrate `waterline-nested` with `waterline`.

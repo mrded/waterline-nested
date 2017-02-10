@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 0.0.4 - 2017-02-10
 ### Fixed
 - Fix a mistake in `createEach()` method.
 - Delete hack to solve https://github.com/balderdashy/waterline/issues/1444 bug.
