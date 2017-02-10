@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Fix a mistake in `createEach()` method.
+- Delete hack to solve https://github.com/balderdashy/waterline/issues/1444 bug.
 
 ## 0.0.3 - 2017-02-07
 ### Added

@@ -43,10 +43,7 @@ var createNested = function(model, values) {
   var oneWayAssociations = _.values(associations.one);
 
   return Promise.all(oneWayAssociations).then(function() {
-    //@TODO: Remove .meta({fetch: true}) once this issue is solved:
-    // - https://github.com/balderdashy/waterline/issues/1444
-    // - https://github.com/balderdashy/waterline/pull/1445
-    var output = mainModel.findOrCreate(_.clone(values), _.clone(values)).meta({fetch: true});
+    var output = mainModel.findOrCreate(_.clone(values), _.clone(values));
 
     return output.then(function(object) {
 
