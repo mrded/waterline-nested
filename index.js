@@ -4,71 +4,83 @@ var _ = require('lodash');
 
 var createEachNested = function(model, records) {
   if (records && records.length > 0) {
-    return createNested(model, records.shift()).then(function() {
-      return createEachNested(model, records);
+    return createNested(model, records.shift()).then(function(object) {
+      return createEachNested(model, records).then(function(objects) {
+        objects.push(object);
+
+        return Promise.resolve(objects);  
+      });
     });
   }
+
+  return Promise.resolve([]);
+};
+
+var getRelationFields = function(model) {
+  var Model = sails.models[model];
+
+  var output = [];
+
+  _.each(Model.attributes, function(schema, field) {
+    if (schema.hasOwnProperty('model') || schema.hasOwnProperty('collection')) {
+      output.push(field);
+    }
+  });
+
+  return output;
 };
 
 var createNested = function(model, values) {
   var mainModel = sails.models[model];
 
-  var associations = {
-    one: {},
-    many: {}
-  };
+  var fields = getRelationFields(model);
 
-  // Go through all fields, and try to find included objects.
-  _.each(mainModel.attributes, function(value, key) {
-    
-    // One Way associations.
-    if (value.model && typeof values[key] === 'object') {
-      associations.one[key] = createNested(value.model, values[key]).then(function(object) {
-        values[key] = object.id;
-      });
-    }
+  for (var i in fields) {
+    var field = fields[i];
 
-    // Many-to-Many associations.
-    if (value.collection && value.dominant && value.through && typeof values[key] === 'object') {
-      associations.many[key] = Promise.all(values[key].map(function(object) {
-        return createNested(value.collection, object).then(function(object) {
-          return object.id;
+    if (typeof values[field] === 'object') {
+      // If the value is an object or array - we need to create it first.
+
+      var relatedSchema = mainModel.attributes[field];
+
+      if (values[field] instanceof Array) {
+        // Many-to-Many associations.
+
+        return createEachNested(relatedSchema.collection, values[field]).then(function(relatedObjects) {
+          delete values[field];
+
+          return createNested(model, values).then(function(object) {
+            // Create relation between objects and new object
+            var relatediModel = sails.models[relatedSchema.through];
+
+            var outputPromises = relatedObjects.map(function(relatedObject) {
+              var data = {};
+
+              data[relatedSchema.collection] = relatedObject.id;
+              data[relatedSchema.via] = object.id;
+
+              return relatediModel.create(data);
+            });
+
+            return Promise.all(outputPromises).then(function() {
+              return object; 
+            }); 
+          });
         });
-      }));
+      }
+      else {
+        // One Way associations.
+        
+        return createNested(relatedSchema.model, values[field]).then(function(object) {
+          values[field] = object.id;
 
-      delete values[key];
-    }
-  });
-
-  var oneWayAssociations = _.values(associations.one);
-
-  return Promise.all(oneWayAssociations).then(function() {
-    var output = mainModel.findOrCreate(_.clone(values), _.clone(values));
-
-    return output.then(function(object) {
-
-      // Wait associations.many callbacks and create relations via 'through' model.
-      var queries = _.map(associations.many, function(value, key) {
-        var attribute = mainModel.attributes[key];
-        var refModel = sails.models[attribute.through];
-
-        return value.then(function(ids) {
-          return Promise.all(ids.map(function(id) {
-            var data = {};
-
-            data[attribute.collection] = id;
-            data[attribute.via] = object.id;
-
-            return refModel.create(data);
-          }));
+          return createNested(model, values);
         });
-      });
+      }
+    }
+  }
 
-      return Promise.all(queries).then(function() {
-        return object;
-      });
-    });
-  });
+  return mainModel.findOrCreate(_.clone(values), _.clone(values));
 };
 
 module.exports.create = createNested;
