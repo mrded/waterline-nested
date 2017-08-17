@@ -23,16 +23,12 @@ A simple helper, allows you to do nested creates and updates with Waterline 0.13
 ## Usage
 
 ```javascript
-// myApp/api/models/User.js
+// ./api/models/User.js
 // A user may have many pets
 module.exports = {
   attributes: {
-    firstName: {
-      type: 'string'
-    },
-    lastName: {
-      type: 'string'
-    },
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
 
     // Add a reference to Pets
     pets: {
@@ -44,19 +40,13 @@ module.exports = {
 ```
 
 ```javascript
-// myApp/api/models/Pet.js
+// ./api/models/Pet.js
 // A pet may only belong to a single user
 module.exports = {
   attributes: {
-    breed: {
-      type: 'string'
-    },
-    type: {
-      type: 'string'
-    },
-    name: {
-      type: 'string'
-    },
+    breed: { type: 'string' },
+    type: { type: 'string' },
+    name: { type: 'string' },
 
     // Add a reference to User
     owner: {
